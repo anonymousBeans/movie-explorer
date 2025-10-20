@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 
-function SearchBar(
+function SearchBar({
   onSearch,
   defaultValue = "",
   placeholder = "Search for a movie…",
   isLoading = false,
-  autoFocus = true
-) {
+  autoFocus = true,
+}) {
   const [q, setQ] = useState(defaultValue);
   const inputRef = useRef(null);
 
