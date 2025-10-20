@@ -10,4 +10,7 @@
     transform: translateY(-4px);
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
   }
+
+  .poster { aspect-ratio: 2 / 3; object-fit: cover; }
+
   
