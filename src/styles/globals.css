@@ -1,6 +1,6 @@
 .card {
     border: 1px solid rgba(255, 255, 255, 0.15);
-    background-color: var(--bs-body-bg);
+    background-color: var(--bs-tertiary-bg);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     transition: all 0.2s ease-in-out;
   }
@@ -11,6 +11,9 @@
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
   }
 
-  .poster { aspect-ratio: 2 / 3; object-fit: cover; }
+  .poster { 
+    aspect-ratio: 2 / 3; 
+    object-fit: cover; 
+}
 
   

@@ -29,9 +29,18 @@ function Home() {
       const data = await res.json();
 
       if (data.Response === "True") {
-        setMovies((prev) =>
-          p === 1 ? data.Search : [...prev, ...data.Search]
-        );
+        setMovies((prev) => {
+          const combined = p === 1 ? data.Search : [...prev, ...data.Search];
+          const seen = new Set();
+          const deduped = [];
+          for (const item of combined) {
+            if (!seen.has(item.imdbID)) {
+              seen.add(item.imdbID);
+              deduped.push(item);
+            }
+          }
+          return deduped;
+        });
         setTotal(Number(data.totalResults || 0));
         setStatus("done");
         setError(null);
