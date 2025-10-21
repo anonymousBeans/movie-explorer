@@ -87,13 +87,13 @@ function Home() {
       </div>
       {status === "idle" && (
         <p className="text-center text-secondary">
-          Tippe etwas ein und suche nach Filmen.
+          Type something and search for movies.
         </p>
       )}
       {status === "loading" && <p className="text-center">Loading…</p>}
       {status === "error" && (
         <p className="text-center text-warning">
-          {error || "Etwas ist schiefgelaufen."}
+          {error || "Something went wrong."}
         </p>
       )}
 
@@ -145,7 +145,7 @@ function Home() {
           </div>
 
           <p className="text-center text-secondary mt-3 small">
-            Zeige {movies.length} von {total} Treffern
+            Show {movies.length} out of {total} results
           </p>
         </>
       )}
