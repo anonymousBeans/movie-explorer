@@ -57,23 +57,50 @@ export default function Details() {
           <h2 className="display-5 mb-4 text-center">
             {movie.Title} <span className="text-secondary">({movie.Year})</span>
           </h2>
-          <div className="row g-4 align-items-start">
+          {movie.Genre &&
+            movie.Genre.split(", ").map((g) => (
+              <span key={g} className="badge bg-secondary me-2 mb-2">
+                {g}
+              </span>
+            ))}
+
+          <div className="row g-4 align-items-start flex-column-reverse flex-md-row">
             <div className="col-12 col-md-8">
               <h3>Description</h3>
               <p>{movie.Plot}</p>
-              <p>{movie.Runtime}</p>
-              <p>{movie.Genre}</p>
-              <p>{movie.Rated}</p>
-              <p>{movie.Director}</p>
-              <p>{movie.Actors}</p>
-              <p>ImdbRating: {movie.imdbRating}</p>
+              <div className="mt-4">
+                <h5 className="text-light mb-3">Details</h5>
+                <p className="mb-1">
+                  <strong>Runtime:</strong> {movie.Runtime}
+                </p>
+                <p className="mb-1">
+                  <strong>Genre:</strong> {movie.Genre}
+                </p>
+                <p className="mb-1">
+                  <strong>Rated:</strong> {movie.Rated}
+                </p>
+                <p className="mb-1">
+                  <strong>Director:</strong> {movie.Director}
+                </p>
+                <p className="mb-1">
+                  <strong>Actors:</strong> {movie.Actors}
+                </p>
+                <p className="mb-0">
+                  <strong>IMDb Rating:</strong> ⭐ {movie.imdbRating}
+                </p>
+              </div>
             </div>
             <div className="col-12 col-md-4">
               <img
-                src={movie.Poster}
+                src={
+                  movie.Poster !== "N/A"
+                    ? movie.Poster
+                    : "https://via.placeholder.com/300x450?text=No+Poster"
+                }
                 alt={movie.Title}
-                className="w-100 poster"
-              ></img>
+                className="img-fluid rounded shadow-sm"
+                style={{ maxHeight: "500px", objectFit: "cover" }}
+              />
             </div>
           </div>
         </>
