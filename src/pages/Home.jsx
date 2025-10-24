@@ -187,7 +187,7 @@ function Home() {
         </>
       )}
 
-      {trending.length > 0 && (
+      {trending.length > 0 && !movies.length && (
         <>
           <h3 className="display-6 mb-3 text-start">Top 20 - Trending</h3>
           <div className="row g-3 justify-content-center">
