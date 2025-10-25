@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect } from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
+import MovieCard from "../components/MovieCard";
 
-const OMDB_KEY = import.meta.env.VITE_OMDB_KEY;
 const TMDB_KEY = import.meta.env.VITE_TMDB_KEY;
 
 function Home() {
@@ -19,41 +18,49 @@ function Home() {
   const navigate = useNavigate();
 
   const fetchSearch = async (term, p = 1) => {
-    if (!OMDB_KEY) {
+    const q = term.trim();
+
+    if (!q) {
+      setMovies([]);
+      setStatus("idle");
+      setError(null);
+      setTotal(0);
+      return;
+    }
+
+    if (!TMDB_KEY) {
       setStatus("error");
-      setError("Missing VITE_OMDB_KEY");
+      setError("Missing VITE_TMDB_KEY");
       return;
     }
     try {
-      const url = `https://www.omdbapi.com/?apikey=${OMDB_KEY}&s=${encodeURIComponent(
-        term
+      const url = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(
+        q
       )}&page=${p}`;
 
       const res = await fetch(url);
       const data = await res.json();
 
-      if (data.Response === "True") {
-        setMovies((prev) => {
-          const combined = p === 1 ? data.Search : [...prev, ...data.Search];
-          const seen = new Set();
-          const deduped = [];
-          for (const item of combined) {
-            if (!seen.has(item.imdbID)) {
-              seen.add(item.imdbID);
-              deduped.push(item);
-            }
-          }
-          return deduped;
-        });
-        setTotal(Number(data.totalResults || 0));
-        setStatus("done");
-        setError(null);
-      } else {
-        if (p === 1) setMovies([]);
-        setTotal(0);
+      if (!res.ok || data.success === false) {
         setStatus("error");
-        setError(data.Error || "No results");
+        setError(data.status_message || `HTTP ${res.status}`);
+        return;
       }
+
+      const results = Array.isArray(data.results) ? data.results : [];
+
+      setMovies((prev) => {
+        const combined = p === 1 ? results : [...prev, ...results];
+        const seen = new Set();
+        return combined.filter((item) => {
+          if (seen.has(item.id)) return false;
+          seen.add(item.id);
+          return true;
+        });
+      });
+      setTotal(Number(data.total_results || 0));
+      setStatus("done");
+      setError(null);
     } catch (e) {
       setStatus("error");
       setError("Network error");
@@ -93,22 +100,8 @@ function Home() {
     loadTrending();
   }, [loadTrending]);
 
-  const goToOmdbDetails = async (tmdbId) => {
-    try {
-      const url = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${TMDB_KEY}&append_to_response=external_ids`;
-      const res = await fetch(url);
-      const data = await res.json();
-      const imdbId = data?.external_ids?.imdb_id;
-
-      if (imdbId) {
-        navigate(`/movie/${imdbId}`);
-      } else {
-        alert("Keine IMDb-ID für diesen Film gefunden 😕");
-      }
-    } catch (e) {
-      console.error(e);
-      alert("Fehler beim Laden der Details");
-    }
+  const goToDetails = (tmdbId) => {
+    navigate(`/tmdb/movie/${tmdbId}`);
   };
 
   return (
@@ -137,36 +130,9 @@ function Home() {
       {movies.length > 0 && (
         <>
           <div className="row g-3 justify-content-center">
-            {movies.map((m) => {
-              const poster =
-                m.Poster && m.Poster !== "N/A"
-                  ? m.Poster
-                  : "https://via.placeholder.com/300x450?text=No+Poster";
-              return (
-                <div key={m.imdbID} className="col-6 col-md-4 col-lg-3">
-                  <Link
-                    to={`/movie/${m.imdbID}`}
-                    className="text-decoration-none text-reset"
-                  >
-                    <div className="card h-100 bg-body-tertiary border border-light-subtle shadow-sm rounded-3 overflow-hidden">
-                      <img
-                        src={poster}
-                        alt={m.Title}
-                        className="w-100 poster"
-                      />
-                      <div className="card-body p-3">
-                        <h6 className="card-title mb-1 text-truncate">
-                          {m.Title}
-                        </h6>
-                        <p className="text-secondary small mb-0">
-                          {m.Year} · {m.Type}
-                        </p>
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-              );
-            })}
+            {movies.map((m) => (
+              <MovieCard key={m.id} movie={m} onClick={goToDetails} />
+            ))}
           </div>
 
           <div className="d-flex justify-content-center mt-4">
@@ -191,35 +157,9 @@ function Home() {
         <>
           <h3 className="display-6 mb-3 text-start">Top 20 - Trending</h3>
           <div className="row g-3 justify-content-center">
-            {trending.map((t) => {
-              const poster = t.poster_path
-                ? `https://image.tmdb.org/t/p/w500${t.poster_path}`
-                : "https://via.placeholder.com/300x450?text=No+Poster";
-              const year = t.release_date ? t.release_date.slice(0, 4) : "—";
-              return (
-                <div key={t.id} className="col-6 col-md-3">
-                  <div
-                    role="button"
-                    onClick={() => goToOmdbDetails(t.id)}
-                    className="text-decoration-none text-reset"
-                  >
-                    <div className="card h-100 bg-body-tertiary border border-light-subtle shadow-sm rounded-3 overflow-hidden">
-                      <img
-                        src={poster}
-                        alt={t.title}
-                        className="img-fluid rounded"
-                      />
-                      <div className="card-body p-3">
-                        <h6 className="card-title mb-1 text-truncate">
-                          {t.title}
-                        </h6>
-                        <p className="text-secondary small mb-0">{year}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {trending.map((m) => (
+              <MovieCard key={m.id} movie={m} onClick={goToDetails} />
+            ))}
           </div>
         </>
       )}
