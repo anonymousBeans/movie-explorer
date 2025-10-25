@@ -9,7 +9,10 @@ export default function MovieCard({ movie, onClick }) {
     <div key={movie.id} className="col-6 col-md-3">
       <div
         role="button"
-        onClick={() => onClick?.(movie.id)}
+        onClick={() => {
+          e.currentTarget.blur();
+          onClick?.(movie.id);
+        }}
         className="text-decoration-none text-reset"
       >
         <div className="card h-100 bg-body-tertiary border border-light-subtle shadow-sm rounded-3 overflow-hidden">
