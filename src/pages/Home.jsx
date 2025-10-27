@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import MovieCard from "../components/MovieCard";
+import { tmdbUrl } from "../lib/tmdb";
+import CategoryRail from "../components/CategoryRail";
 
 const TMDB_KEY = import.meta.env.VITE_TMDB_KEY;
 
@@ -13,8 +15,14 @@ function Home() {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+
   const [trending, setTrending] = useState([]);
   const [upcoming, setUpcoming] = useState([]);
+  const [action, setAction] = useState([]);
+  const [comedy, setComdey] = useState([]);
+  const [documentary, setDocumentary] = useState([]);
+  const [horror, setHorror] = useState([]);
+  const [romance, setRomance] = useState([]);
 
   const navigate = useNavigate();
 
@@ -35,9 +43,11 @@ function Home() {
       return;
     }
     try {
-      const url = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(
-        q
-      )}&page=${p}`;
+      const url = tmdbUrl(
+        "/search/movie",
+        { query: encodeURIComponent(q), page: p },
+        TMDB_KEY
+      );
 
       const res = await fetch(url);
       const data = await res.json();
@@ -98,7 +108,7 @@ function Home() {
 
   const loadTrending = useCallback(async () => {
     try {
-      const url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${TMDB_KEY}`;
+      const url = tmdbUrl("/trending/movie/week", {}, TMDB_KEY);
       const res = await fetch(url);
       const data = await res.json();
       setTrending(data.results);
@@ -109,12 +119,125 @@ function Home() {
 
   const loadUpcoming = useCallback(async () => {
     try {
-      const url = `https://api.themoviedb.org/3/movie/upcoming?language=de-DE&region=DE&page=1&api_key=${TMDB_KEY}`;
+      const url = tmdbUrl(
+        "/movie/upcoming",
+        {
+          language: "en-US",
+          region: "US",
+          page: "1",
+        },
+        TMDB_KEY
+      );
       const res = await fetch(url);
       const data = await res.json();
       setUpcoming(data.results);
     } catch (e) {
       console.warn("Upcoming failed");
+    }
+  }, [TMDB_KEY]);
+
+  const loadAction = useCallback(async () => {
+    try {
+      const url = tmdbUrl(
+        "/discover/movie",
+        {
+          with_genres: 28,
+          language: "en-US",
+          region: "US",
+          page: "1",
+          sort_by: "popularity.desc",
+        },
+        TMDB_KEY
+      );
+      const res = await fetch(url);
+      const data = await res.json();
+      setAction(data.results);
+    } catch (e) {
+      console.warn("Action failed");
+    }
+  }, [TMDB_KEY]);
+
+  const loadComedy = useCallback(async () => {
+    try {
+      const url = tmdbUrl(
+        "/discover/movie",
+        {
+          with_genres: 35,
+          language: "en-US",
+          region: "US",
+          page: "1",
+          sort_by: "popularity.desc",
+        },
+        TMDB_KEY
+      );
+      const res = await fetch(url);
+      const data = await res.json();
+      setComdey(data.results);
+    } catch (e) {
+      console.warn("Comedy failed");
+    }
+  }, [TMDB_KEY]);
+
+  const loadDocumentary = useCallback(async () => {
+    try {
+      const url = tmdbUrl(
+        "/discover/movie",
+        {
+          with_genres: 99,
+          language: "en-US",
+          region: "US",
+          page: "1",
+          sort_by: "popularity.desc",
+        },
+        TMDB_KEY
+      );
+      const res = await fetch(url);
+      const data = await res.json();
+      setDocumentary(data.results);
+    } catch (e) {
+      console.warn("Documentary failed");
+    }
+  }, [TMDB_KEY]);
+
+  const loadHorror = useCallback(async () => {
+    try {
+      const url = tmdbUrl(
+        "/discover/movie",
+        {
+          with_genres: 27,
+          language: "en-US",
+          region: "US",
+          page: "1",
+          sort_by: "popularity.desc",
+        },
+        TMDB_KEY
+      );
+      const res = await fetch(url);
+      const data = await res.json();
+      setHorror(data.results);
+    } catch (e) {
+      console.warn("Horror failed");
+    }
+  }, [TMDB_KEY]);
+
+  const loadRomance = useCallback(async () => {
+    try {
+      const url = tmdbUrl(
+        "/discover/movie",
+        {
+          with_genres: 10749,
+          language: "en-US",
+          region: "US",
+          page: "1",
+          sort_by: "popularity.desc",
+        },
+        TMDB_KEY
+      );
+      const res = await fetch(url);
+      const data = await res.json();
+      setRomance(data.results);
+    } catch (e) {
+      console.warn("Romance failed");
     }
   }, [TMDB_KEY]);
 
@@ -131,7 +254,20 @@ function Home() {
   useEffect(() => {
     loadTrending();
     loadUpcoming();
-  }, [loadTrending, loadUpcoming]);
+    loadAction();
+    loadComedy();
+    loadDocumentary();
+    loadHorror();
+    loadRomance();
+  }, [
+    loadTrending,
+    loadUpcoming,
+    loadAction,
+    loadComedy,
+    loadDocumentary,
+    loadHorror,
+    loadRomance,
+  ]);
 
   const goToDetails = (tmdbId) => {
     navigate(`/tmdb/movie/${tmdbId}`);
@@ -189,31 +325,33 @@ function Home() {
         </>
       ) : (
         <>
-          {trending.length > 0 && (
-            <>
-              <h3 className="display-6 mb-3 text-start">Top 20 - Trending</h3>
-              <div className="scroll-row">
-                {trending.map((m) => (
-                  <div key={m.id} className="scroll-item">
-                    <MovieCard movie={m} onClick={goToDetails} />
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-          {upcoming.length > 0 && (
-            <>
-              <p></p>
-              <h3 className="display-6 mb-3 text-start">Upcoming</h3>
-              <div className="scroll-row">
-                {upcoming.map((m) => (
-                  <div key={m.id} className="scroll-item">
-                    <MovieCard movie={m} onClick={goToDetails} />
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+          <CategoryRail onClick={goToDetails} items={trending}>
+            Trending
+          </CategoryRail>
+
+          <CategoryRail onClick={goToDetails} items={upcoming}>
+            Upcoming
+          </CategoryRail>
+
+          <CategoryRail onClick={goToDetails} items={action}>
+            Action
+          </CategoryRail>
+
+          <CategoryRail onClick={goToDetails} items={comedy}>
+            Comedy
+          </CategoryRail>
+
+          <CategoryRail onClick={goToDetails} items={documentary}>
+            Documentary
+          </CategoryRail>
+
+          <CategoryRail onClick={goToDetails} items={horror}>
+            Horror
+          </CategoryRail>
+
+          <CategoryRail onClick={goToDetails} items={romance}>
+            Romance
+          </CategoryRail>
         </>
       )}
     </div>
