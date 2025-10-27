@@ -1,32 +1,33 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 
-const KEY = import.meta.env.VITE_OMDB_KEY;
+const TMDB_KEY = import.meta.env.VITE_TMDB_KEY;
 
 export default function Details() {
-  const { imdbID } = useParams();
+  const { id } = useParams();
 
   const [movie, setMovie] = useState(null);
   const [status, setStatus] = useState("");
   const [error, setError] = useState(null);
 
-  const showDetails = async (id) => {
+  const showDetails = async () => {
+    if (!id) return;
+
     try {
-      const url = `https://www.omdbapi.com/?apikey=${KEY}&i=${encodeURIComponent(
-        id
-      )}&plot=full`;
+      const url = `https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}&language=en-US&append_to_response=credits,images,videos,recommendations,similar`;
 
       const res = await fetch(url);
       const data = await res.json();
 
-      if (data.Response === "True") {
-        setMovie(data);
-        setStatus("done");
-        setError(null);
-      } else {
+      if (!res.ok || data.success === false) {
         setStatus("error");
-        setError("Error displaying the movie");
+        setError(data.status_message || `HTTP ${res.status}`);
+        return;
       }
+
+      setMovie(data);
+      setStatus("done");
+      setError(null);
     } catch (e) {
       setStatus("error");
       setError("Network error");
@@ -34,11 +35,11 @@ export default function Details() {
   };
 
   useEffect(() => {
-    if (!imdbID) return;
-    setStatus("Loading..");
+    if (!id) return;
+    setStatus("loading");
     setError(null);
-    showDetails(imdbID);
-  }, [imdbID]);
+    showDetails(id);
+  }, [id]);
 
   return (
     <div className="container py-4">
@@ -55,49 +56,54 @@ export default function Details() {
       {status === "done" && movie && (
         <>
           <h2 className="display-5 mb-4 text-center">
-            {movie.Title} <span className="text-secondary">({movie.Year})</span>
+            {movie.title}{" "}
+            <span className="text-secondary">
+              ({movie.release_date?.slice(0, 4) || "—"})
+            </span>
           </h2>
-          {movie.Genre &&
-            movie.Genre.split(", ").map((g) => (
-              <span key={g} className="badge bg-secondary me-2 mb-2">
-                {g}
+          <div className="mb-2">
+            {movie.genres?.map((g) => (
+              <span key={g.id} className="badge bg-secondary me-1">
+                {g.name}
               </span>
             ))}
+          </div>
 
           <div className="row g-4 align-items-start flex-column-reverse flex-md-row">
             <div className="col-12 col-md-8">
               <h3>Description</h3>
-              <p>{movie.Plot}</p>
+              <p>{movie.overview}</p>
               <div className="mt-4">
                 <h5 className="text-light mb-3">Details</h5>
                 <p className="mb-1">
-                  <strong>Runtime:</strong> {movie.Runtime}
+                  <strong>Runtime:</strong> {movie.runtime}min
                 </p>
                 <p className="mb-1">
-                  <strong>Genre:</strong> {movie.Genre}
+                  <strong>Director:</strong>{" "}
+                  {movie.credits?.crew?.find((c) => c.job === "Director")
+                    ?.name || "—"}
                 </p>
                 <p className="mb-1">
-                  <strong>Rated:</strong> {movie.Rated}
-                </p>
-                <p className="mb-1">
-                  <strong>Director:</strong> {movie.Director}
-                </p>
-                <p className="mb-1">
-                  <strong>Actors:</strong> {movie.Actors}
+                  <strong>Actors:</strong>{" "}
+                  {movie.credits?.cast
+                    ?.slice(0, 5)
+                    .map((a) => a.name)
+                    .join(", ")}
                 </p>
                 <p className="mb-0">
-                  <strong>IMDb Rating:</strong> ⭐ {movie.imdbRating}
+                  <strong>TMDB Rating:</strong> ⭐{" "}
+                  {movie.vote_average?.toFixed?.(1) ?? "—"}
                 </p>
               </div>
             </div>
             <div className="col-12 col-md-4">
               <img
                 src={
-                  movie.Poster !== "N/A"
-                    ? movie.Poster
-                    : "https://via.placeholder.com/300x450?text=No+Poster"
+                  movie.poster_path
+                    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                    : "https://placehold.co/300x450?text=No+Poster&font=roboto"
                 }
-                alt={movie.Title}
+                alt={movie.title}
                 className="img-fluid rounded shadow-sm"
                 style={{ maxHeight: "500px", objectFit: "cover" }}
               />

@@ -1,18 +1,27 @@
-import { Link } from "react-router-dom";
+export default function MovieCard({ movie, onClick }) {
+  const poster = movie.poster_path
+    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+    : "https://placehold.co/300x450?text=No+Poster&font=roboto";
 
-export default function MovieCard({ movie }) {
+  const year = movie.release_date ? movie.release_date.slice(0, 4) : "—";
+
   return (
-    <div className="card h-100 bg-body-tertiary border border-light-subtle shadow-sm rounded-3">
-      <img
-        src="https://via.placeholder.com/300x450?text=Poster"
-        className="w-100 poster"
-        alt={movie.title}
-      />
-      <div className="card-body p-2">
-        <h6 className="card-title text-truncate mb-1">{movie.title}</h6>
-        <p className="text-muted small mb-0">
-          {movie.year} · {movie.genre}
-        </p>
+    <div key={movie.id} className="col-6 col-md-3">
+      <div
+        role="button"
+        onClick={() => {
+          e.currentTarget.blur();
+          onClick?.(movie.id);
+        }}
+        className="text-decoration-none text-reset"
+      >
+        <div className="card h-100 bg-body-tertiary border border-light-subtle shadow-sm rounded-3 overflow-hidden">
+          <img src={poster} alt={movie.title} className="img-fluid rounded" />
+          <div className="card-body p-3">
+            <h6 className="card-title mb-1 text-truncate">{movie.title}</h6>
+            <p className="text-secondary small mb-0">{year}</p>
+          </div>
+        </div>
       </div>
     </div>
   );
