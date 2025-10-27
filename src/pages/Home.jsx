@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import MovieCard from "../components/MovieCard";
+import { tmdbUrl } from "../lib/tmdb";
 
 const TMDB_KEY = import.meta.env.VITE_TMDB_KEY;
 
@@ -35,9 +36,11 @@ function Home() {
       return;
     }
     try {
-      const url = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(
-        q
-      )}&page=${p}`;
+      const url = tmdbUrl(
+        "/search/movie",
+        { query: encodeURIComponent(q), page: p },
+        TMDB_KEY
+      );
 
       const res = await fetch(url);
       const data = await res.json();
@@ -98,7 +101,7 @@ function Home() {
 
   const loadTrending = useCallback(async () => {
     try {
-      const url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${TMDB_KEY}`;
+      const url = tmdbUrl("/trending/movie/week", {}, TMDB_KEY);
       const res = await fetch(url);
       const data = await res.json();
       setTrending(data.results);
@@ -109,7 +112,15 @@ function Home() {
 
   const loadUpcoming = useCallback(async () => {
     try {
-      const url = `https://api.themoviedb.org/3/movie/upcoming?language=en-US&region=US&page=1&api_key=${TMDB_KEY}`;
+      const url = tmdbUrl(
+        "/movie/upcoming",
+        {
+          language: "en-US",
+          region: "US",
+          page: "1",
+        },
+        TMDB_KEY
+      );
       const res = await fetch(url);
       const data = await res.json();
       setUpcoming(data.results);
