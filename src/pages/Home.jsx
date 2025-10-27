@@ -15,10 +15,19 @@ function Home() {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+
   const [trending, setTrending] = useState([]);
   const [upcoming, setUpcoming] = useState([]);
+  const [action, setAction] = useState([]);
+  const [comedy, setComdey] = useState([]);
+  const [documentary, setDocumentary] = useState([]);
+  const [horror, setHorror] = useState([]);
+  const [romance, setRomance] = useState([]);
 
   const navigate = useNavigate();
+
+  const genreIDs = [28, 35, 99, 27, 10749];
+  const genres = ["Action", "Comedy", "Documentary", "Horror", "Romance"];
 
   const fetchSearch = async (term, p = 1) => {
     const q = term.trim();
@@ -130,6 +139,111 @@ function Home() {
     }
   }, [TMDB_KEY]);
 
+  const loadAction = useCallback(async () => {
+    try {
+      const url = tmdbUrl(
+        "/discover/movie",
+        {
+          with_genres: 28,
+          language: "en-US",
+          region: "US",
+          page: "1",
+          sort_by: "popularity.desc",
+        },
+        TMDB_KEY
+      );
+      const res = await fetch(url);
+      const data = await res.json();
+      setAction(data.results);
+    } catch (e) {
+      console.warn("Action failed");
+    }
+  }, [TMDB_KEY]);
+
+  const loadComedy = useCallback(async () => {
+    try {
+      const url = tmdbUrl(
+        "/discover/movie",
+        {
+          with_genres: 35,
+          language: "en-US",
+          region: "US",
+          page: "1",
+          sort_by: "popularity.desc",
+        },
+        TMDB_KEY
+      );
+      const res = await fetch(url);
+      const data = await res.json();
+      setComdey(data.results);
+    } catch (e) {
+      console.warn("Comedy failed");
+    }
+  }, [TMDB_KEY]);
+
+  const loadDocumentary = useCallback(async () => {
+    try {
+      const url = tmdbUrl(
+        "/discover/movie",
+        {
+          with_genres: 99,
+          language: "en-US",
+          region: "US",
+          page: "1",
+          sort_by: "popularity.desc",
+        },
+        TMDB_KEY
+      );
+      const res = await fetch(url);
+      const data = await res.json();
+      setDocumentary(data.results);
+    } catch (e) {
+      console.warn("Documentary failed");
+    }
+  }, [TMDB_KEY]);
+
+  const loadHorror = useCallback(async () => {
+    try {
+      const url = tmdbUrl(
+        "/discover/movie",
+        {
+          with_genres: 27,
+          language: "en-US",
+          region: "US",
+          page: "1",
+          sort_by: "popularity.desc",
+        },
+        TMDB_KEY
+      );
+      const res = await fetch(url);
+      const data = await res.json();
+      setHorror(data.results);
+    } catch (e) {
+      console.warn("Horror failed");
+    }
+  }, [TMDB_KEY]);
+
+  const loadRomance = useCallback(async () => {
+    try {
+      const url = tmdbUrl(
+        "/discover/movie",
+        {
+          with_genres: 10749,
+          language: "en-US",
+          region: "US",
+          page: "1",
+          sort_by: "popularity.desc",
+        },
+        TMDB_KEY
+      );
+      const res = await fetch(url);
+      const data = await res.json();
+      setRomance(data.results);
+    } catch (e) {
+      console.warn("Romance failed");
+    }
+  }, [TMDB_KEY]);
+
   const handleClear = () => {
     setQuery("");
     setStatus("idle");
@@ -143,7 +257,20 @@ function Home() {
   useEffect(() => {
     loadTrending();
     loadUpcoming();
-  }, [loadTrending, loadUpcoming]);
+    loadAction();
+    loadComedy();
+    loadDocumentary();
+    loadHorror();
+    loadRomance();
+  }, [
+    loadTrending,
+    loadUpcoming,
+    loadAction,
+    loadComedy,
+    loadDocumentary,
+    loadHorror,
+    loadRomance,
+  ]);
 
   const goToDetails = (tmdbId) => {
     navigate(`/tmdb/movie/${tmdbId}`);
@@ -206,6 +333,26 @@ function Home() {
 
       <CategoryRail onClick={goToDetails} items={upcoming}>
         Upcoming
+      </CategoryRail>
+
+      <CategoryRail onClick={goToDetails} items={action}>
+        Action
+      </CategoryRail>
+
+      <CategoryRail onClick={goToDetails} items={comedy}>
+        Comedy
+      </CategoryRail>
+
+      <CategoryRail onClick={goToDetails} items={documentary}>
+        Documentary
+      </CategoryRail>
+
+      <CategoryRail onClick={goToDetails} items={horror}>
+        Horror
+      </CategoryRail>
+
+      <CategoryRail onClick={goToDetails} items={romance}>
+        Romance
       </CategoryRail>
     </div>
   );
