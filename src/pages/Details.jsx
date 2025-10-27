@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { tmdbUrl } from "../lib/tmdb";
 
 const TMDB_KEY = import.meta.env.VITE_TMDB_KEY;
 
@@ -19,8 +20,15 @@ export default function Details() {
 
     (async () => {
       try {
-        const url = `https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}&language=en-US&append_to_response=credits,images,videos,recommendations,similar`;
-
+        const url = tmdbUrl(
+          "/movie/" + id,
+          {
+            language: "en-US",
+            region: "us",
+            append_to_response: "credits,images,videos,recommendations,similar",
+          },
+          TMDB_KEY
+        );
         const res = await fetch(url);
         const data = await res.json();
 
