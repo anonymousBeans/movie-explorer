@@ -14,6 +14,7 @@ function Home() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [trending, setTrending] = useState([]);
+  const [upcoming, setUpcoming] = useState([]);
 
   const navigate = useNavigate();
 
@@ -75,6 +76,7 @@ function Home() {
       setStatus("idle");
       setError(null);
       loadTrending();
+      loadUpcoming();
       return;
     }
 
@@ -105,6 +107,17 @@ function Home() {
     }
   }, [TMDB_KEY]);
 
+  const loadUpcoming = useCallback(async () => {
+    try {
+      const url = `https://api.themoviedb.org/3/movie/upcoming?language=de-DE&region=DE&page=1&api_key=${TMDB_KEY}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      setUpcoming(data.results);
+    } catch (e) {
+      console.warn("Upcoming failed");
+    }
+  });
+
   const handleClear = () => {
     setQuery("");
     setStatus("idle");
@@ -112,11 +125,13 @@ function Home() {
     setTotal(0);
     setError(null);
     loadTrending();
+    loadUpcoming();
   };
 
   useEffect(() => {
     loadTrending();
-  }, [loadTrending]);
+    loadUpcoming();
+  }, [loadTrending, loadUpcoming]);
 
   const goToDetails = (tmdbId) => {
     navigate(`/tmdb/movie/${tmdbId}`);
@@ -171,16 +186,29 @@ function Home() {
           </p>
         </>
       ) : (
-        trending.length > 0 && (
-          <>
-            <h3 className="display-6 mb-3 text-start">Top 20 - Trending</h3>
-            <div className="row g-3 justify-content-center">
-              {trending.map((m) => (
-                <MovieCard key={m.id} movie={m} onClick={goToDetails} />
-              ))}
-            </div>
-          </>
-        )
+        <>
+          {trending.length > 0 && (
+            <>
+              <h3 className="display-6 mb-3 text-start">Top 20 - Trending</h3>
+              <div className="row g-3 justify-content-center">
+                {trending.map((m) => (
+                  <MovieCard key={m.id} movie={m} onClick={goToDetails} />
+                ))}
+              </div>
+            </>
+          )}
+          {upcoming.length > 0 && (
+            <>
+              <p></p>
+              <h3 className="display-6 mb-3 text-start">Upcoming</h3>
+              <div className="row g-3 justify-content-center">
+                {upcoming.map((m) => (
+                  <MovieCard key={m.id} movie={m} onClick={goToDetails} />
+                ))}
+              </div>
+            </>
+          )}
+        </>
       )}
     </div>
   );
