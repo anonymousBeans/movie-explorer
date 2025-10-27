@@ -1,17 +1,23 @@
+:root {
+  --card-radius: 12px;
+}
+
 .card, 
 .card:focus, 
 .card:active{
+  border-radius: var(--card-radius);
   display: flex;
   flex-direction: column;
   border: 1px solid rgba(255, 255, 255, 0.15);
   background-color: var(--bs-tertiary-bg);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease-in-out;
+  overflow: hidden;
 }
   
 .card:hover {
-  border-color: rgba(255, 255, 255, 0.6) !important;
-  border-width: 2px !important;
+  outline: 2px solid rgba(255,255,255,.6);
+  outline-offset: -1px;
   transform: translateY(-4px);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
 }
@@ -30,9 +36,10 @@
 }
 
 .poster { 
-  aspect-ratio: 2 / 3; 
+  width: 100%;
   object-fit: cover; 
   display: block;
+  overflow: hidden;
 }
 
 .poster-wrap {
