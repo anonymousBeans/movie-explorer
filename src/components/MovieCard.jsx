@@ -9,7 +9,7 @@ export default function MovieCard({ movie, onClick }) {
     <div key={movie.id} className="col-6 col-md-3">
       <div
         role="button"
-        onClick={() => {
+        onClick={(e) => {
           e.currentTarget.blur();
           onClick?.(movie.id);
         }}
