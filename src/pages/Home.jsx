@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import MovieCard from "../components/MovieCard";
 import { tmdbUrl } from "../lib/tmdb";
+import CategoryRail from "../components/CategoryRail";
 
 const TMDB_KEY = import.meta.env.VITE_TMDB_KEY;
 
@@ -172,7 +173,7 @@ function Home() {
         </p>
       )}
 
-      {movies.length > 0 ? (
+      {movies.length > 0 && (
         <>
           <div className="row g-3 justify-content-center">
             {movies.map((m) => (
@@ -198,35 +199,14 @@ function Home() {
             Show {movies.length} out of {total} results
           </p>
         </>
-      ) : (
-        <>
-          {trending.length > 0 && (
-            <>
-              <h3 className="display-6 mb-3 text-start">Top 20 - Trending</h3>
-              <div className="scroll-row">
-                {trending.map((m) => (
-                  <div key={m.id} className="scroll-item">
-                    <MovieCard movie={m} onClick={goToDetails} />
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-          {upcoming.length > 0 && (
-            <>
-              <p></p>
-              <h3 className="display-6 mb-3 text-start">Upcoming</h3>
-              <div className="scroll-row">
-                {upcoming.map((m) => (
-                  <div key={m.id} className="scroll-item">
-                    <MovieCard movie={m} onClick={goToDetails} />
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </>
       )}
+      <CategoryRail onClick={goToDetails} items={trending}>
+        Trending
+      </CategoryRail>
+
+      <CategoryRail onClick={goToDetails} items={upcoming}>
+        Upcoming
+      </CategoryRail>
     </div>
   );
 }
