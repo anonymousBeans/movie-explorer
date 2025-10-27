@@ -12,26 +12,34 @@ export default function Details() {
 
   const showDetails = async () => {
     if (!id) return;
+    setStatus("loading");
+    setError(null);
 
-    try {
-      const url = `https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}&language=en-US&append_to_response=credits,images,videos,recommendations,similar`;
+    const ac = new AbortController();
 
-      const res = await fetch(url);
-      const data = await res.json();
+    (async () => {
+      try {
+        const url = `https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}&language=en-US&append_to_response=credits,images,videos,recommendations,similar`;
 
-      if (!res.ok || data.success === false) {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!res.ok || data.success === false) {
+          setStatus("error");
+          setError(data.status_message || `HTTP ${res.status}`);
+          return;
+        }
+
+        setMovie(data);
+        setStatus("done");
+        setError(null);
+      } catch (e) {
         setStatus("error");
-        setError(data.status_message || `HTTP ${res.status}`);
-        return;
+        setError("Network error");
       }
+    })();
 
-      setMovie(data);
-      setStatus("done");
-      setError(null);
-    } catch (e) {
-      setStatus("error");
-      setError("Network error");
-    }
+    return () => ac.abort();
   };
 
   useEffect(() => {
