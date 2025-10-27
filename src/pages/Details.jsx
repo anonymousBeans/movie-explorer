@@ -22,10 +22,13 @@ export default function Details() {
       try {
         const url = tmdbUrl(
           "/movie/" + id,
-          { language: "en-US", region: "us" },
+          {
+            language: "en-US",
+            region: "us",
+            append_to_response: "credits,images,videos,recommendations,similar",
+          },
           TMDB_KEY
         );
-
         const res = await fetch(url);
         const data = await res.json();
 
