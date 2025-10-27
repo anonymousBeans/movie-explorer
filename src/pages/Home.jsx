@@ -116,7 +116,7 @@ function Home() {
     } catch (e) {
       console.warn("Upcoming failed");
     }
-  });
+  }, [TMDB_KEY]);
 
   const handleClear = () => {
     setQuery("");
