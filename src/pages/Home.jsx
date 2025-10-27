@@ -26,9 +26,6 @@ function Home() {
 
   const navigate = useNavigate();
 
-  const genreIDs = [28, 35, 99, 27, 10749];
-  const genres = ["Action", "Comedy", "Documentary", "Horror", "Romance"];
-
   const fetchSearch = async (term, p = 1) => {
     const q = term.trim();
 
