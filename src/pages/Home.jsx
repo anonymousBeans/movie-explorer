@@ -69,6 +69,15 @@ function Home() {
 
   const handleSearch = async (term) => {
     setQuery(term);
+
+    if (!term.trim()) {
+      setMovies([]);
+      setStatus("idle");
+      setError(null);
+      loadTrending();
+      return;
+    }
+
     setPage(1);
     setStatus("loading");
     setError(null);
@@ -96,6 +105,15 @@ function Home() {
     }
   }, [TMDB_KEY]);
 
+  const handleClear = () => {
+    setQuery("");
+    setStatus("idle");
+    setMovies([]);
+    setTotal(0);
+    setError(null);
+    loadTrending();
+  };
+
   useEffect(() => {
     loadTrending();
   }, [loadTrending]);
@@ -110,6 +128,7 @@ function Home() {
       <div className="mb-4">
         <SearchBar
           onSearch={handleSearch}
+          onClear={handleClear}
           defaultValue={query}
           isLoading={status === "loading"}
           placeholder="Search movies…"
@@ -127,7 +146,7 @@ function Home() {
         </p>
       )}
 
-      {movies.length > 0 && (
+      {movies.length > 0 ? (
         <>
           <div className="row g-3 justify-content-center">
             {movies.map((m) => (
@@ -151,17 +170,17 @@ function Home() {
             Show {movies.length} out of {total} results
           </p>
         </>
-      )}
-
-      {trending.length > 0 && !movies.length && (
-        <>
-          <h3 className="display-6 mb-3 text-start">Top 20 - Trending</h3>
-          <div className="row g-3 justify-content-center">
-            {trending.map((m) => (
-              <MovieCard key={m.id} movie={m} onClick={goToDetails} />
-            ))}
-          </div>
-        </>
+      ) : (
+        trending.length > 0 && (
+          <>
+            <h3 className="display-6 mb-3 text-start">Top 20 - Trending</h3>
+            <div className="row g-3 justify-content-center">
+              {trending.map((m) => (
+                <MovieCard key={m.id} movie={m} onClick={goToDetails} />
+              ))}
+            </div>
+          </>
+        )
       )}
     </div>
   );

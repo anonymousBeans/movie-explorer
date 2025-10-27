@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 function SearchBar({
   onSearch,
+  onClear,
   defaultValue = "",
   placeholder = "Search for a movie…",
   isLoading = false,
@@ -17,8 +18,16 @@ function SearchBar({
   const submit = (e) => {
     e.preventDefault();
     const term = q.trim();
-    if (!term) return;
+    if (!term) {
+      onClear?.();
+      return;
+    }
     onSearch?.(term);
+  };
+
+  const onInput = (e) => {
+    const v = e.target.value;
+    setQ(v);
   };
 
   return (
@@ -28,7 +37,7 @@ function SearchBar({
         type="search"
         className="form-control w-50"
         value={q}
-        onChange={(e) => setQ(e.target.value)}
+        onChange={onInput}
         placeholder={placeholder}
         aria-label="Filmsuche"
       />
