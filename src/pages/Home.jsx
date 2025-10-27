@@ -297,7 +297,7 @@ function Home() {
         </p>
       )}
 
-      {movies.length > 0 && (
+      {movies.length > 0 ? (
         <>
           <div className="row g-3 justify-content-center">
             {movies.map((m) => (
@@ -323,34 +323,37 @@ function Home() {
             Show {movies.length} out of {total} results
           </p>
         </>
+      ) : (
+        <>
+          <CategoryRail onClick={goToDetails} items={trending}>
+            Trending
+          </CategoryRail>
+
+          <CategoryRail onClick={goToDetails} items={upcoming}>
+            Upcoming
+          </CategoryRail>
+
+          <CategoryRail onClick={goToDetails} items={action}>
+            Action
+          </CategoryRail>
+
+          <CategoryRail onClick={goToDetails} items={comedy}>
+            Comedy
+          </CategoryRail>
+
+          <CategoryRail onClick={goToDetails} items={documentary}>
+            Documentary
+          </CategoryRail>
+
+          <CategoryRail onClick={goToDetails} items={horror}>
+            Horror
+          </CategoryRail>
+
+          <CategoryRail onClick={goToDetails} items={romance}>
+            Romance
+          </CategoryRail>
+        </>
       )}
-      <CategoryRail onClick={goToDetails} items={trending}>
-        Trending
-      </CategoryRail>
-
-      <CategoryRail onClick={goToDetails} items={upcoming}>
-        Upcoming
-      </CategoryRail>
-
-      <CategoryRail onClick={goToDetails} items={action}>
-        Action
-      </CategoryRail>
-
-      <CategoryRail onClick={goToDetails} items={comedy}>
-        Comedy
-      </CategoryRail>
-
-      <CategoryRail onClick={goToDetails} items={documentary}>
-        Documentary
-      </CategoryRail>
-
-      <CategoryRail onClick={goToDetails} items={horror}>
-        Horror
-      </CategoryRail>
-
-      <CategoryRail onClick={goToDetails} items={romance}>
-        Romance
-      </CategoryRail>
     </div>
   );
 }
