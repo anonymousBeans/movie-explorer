@@ -165,7 +165,9 @@ function Home() {
         <>
           <div className="row g-3 justify-content-center">
             {movies.map((m) => (
-              <MovieCard key={m.id} movie={m} onClick={goToDetails} />
+              <div key={m.id} className="col-6 col-md-4 col-lg-3">
+                <MovieCard movie={m} onClick={goToDetails} />
+              </div>
             ))}
           </div>
 
@@ -190,9 +192,11 @@ function Home() {
           {trending.length > 0 && (
             <>
               <h3 className="display-6 mb-3 text-start">Top 20 - Trending</h3>
-              <div className="row g-3 justify-content-center">
+              <div className="scroll-row">
                 {trending.map((m) => (
-                  <MovieCard key={m.id} movie={m} onClick={goToDetails} />
+                  <div key={m.id} className="scroll-item">
+                    <MovieCard movie={m} onClick={goToDetails} />
+                  </div>
                 ))}
               </div>
             </>
@@ -201,9 +205,11 @@ function Home() {
             <>
               <p></p>
               <h3 className="display-6 mb-3 text-start">Upcoming</h3>
-              <div className="row g-3 justify-content-center">
+              <div className="scroll-row">
                 {upcoming.map((m) => (
-                  <MovieCard key={m.id} movie={m} onClick={goToDetails} />
+                  <div key={m.id} className="scroll-item">
+                    <MovieCard movie={m} onClick={goToDetails} />
+                  </div>
                 ))}
               </div>
             </>
