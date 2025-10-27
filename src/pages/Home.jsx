@@ -109,7 +109,7 @@ function Home() {
 
   const loadUpcoming = useCallback(async () => {
     try {
-      const url = `https://api.themoviedb.org/3/movie/upcoming?language=de-DE&region=DE&page=1&api_key=${TMDB_KEY}`;
+      const url = `https://api.themoviedb.org/3/movie/upcoming?language=en-US&region=US&page=1&api_key=${TMDB_KEY}`;
       const res = await fetch(url);
       const data = await res.json();
       setUpcoming(data.results);
